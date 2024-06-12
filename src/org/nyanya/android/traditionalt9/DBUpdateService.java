@@ -2,6 +2,7 @@ package org.nyanya.android.traditionalt9;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -50,14 +51,22 @@ public class DBUpdateService extends IntentService {
 		}
 		Log.d("T9DBUpdate.onHandle", "Update pass check.");
 		// do real things
-		Notification notification = new Notification(R.drawable.ime_en_lang_lower, getText(R.string.updating_database_title),
-				System.currentTimeMillis());
 		Intent notificationIntent = new Intent(this, DBUpdateService.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(this, getText(R.string.updating_database_title),
-				getText(R.string.updating_database), pendingIntent);
-		startForeground(UPDATING_NOTIFICATION_ID, notification);
 
+		NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+		Notification.Builder nBuilder = new Notification.Builder(this);
+		Notification notification = nBuilder
+				.setContentIntent(pendingIntent)
+				.setContentTitle(getText(R.string.updating_database_title))
+				.setContentText(getText(R.string.updating_database))
+				.setSmallIcon(R.drawable.ime_en_lang_lower)
+				.getNotification();
+
+		notificationManager.notify(UPDATING_NOTIFICATION_ID, notification);
+
+		startForeground(UPDATING_NOTIFICATION_ID, notification);
 
 
 		//put this in a thread
