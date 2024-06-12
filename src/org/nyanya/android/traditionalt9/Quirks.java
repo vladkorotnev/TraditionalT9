@@ -15,8 +15,14 @@ public class Quirks {
 
         if(manufacturer.equals("SHARP")) {
             if(model.equals("SH-01J")) {
-                q.leftSoftKey = 0x00000083; //KeyEvent.KEYCODE_F2;
-                q.rightSoftKey = 0x00000084; //KeyEvent.KEYCODE_F2;
+                q.leftSoftKey = KeyEvent.KEYCODE_F1;
+                q.rightSoftKey = KeyEvent.KEYCODE_F2;
+            }
+        }
+        else if(manufacturer.equals("PANASONIC")) {
+            if(model.equals("P-01J")) {
+                q.leftSoftKey = KeyEvent.KEYCODE_MENU;
+                q.rightSoftKey = KeyEvent.KEYCODE_F2;
             }
         }
 
