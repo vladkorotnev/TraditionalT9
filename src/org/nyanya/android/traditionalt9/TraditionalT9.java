@@ -302,6 +302,7 @@ public class TraditionalT9 extends InputMethodService implements
 		}
 		mFirstPress = true;
 		mEditing = EDITING;
+		mQuirks.runStartHooks();
 		// Reset our state. We want to do this even if restarting, because
 		// the underlying state of the text editor could have changed in any
 		// way.
@@ -482,6 +483,7 @@ public class TraditionalT9 extends InputMethodService implements
 
 		// TODO: check this?
 		mEditing = NON_EDIT;
+		mQuirks.runEndHooks();
 		hideWindow();
 		hideStatusIcon();
 	}
