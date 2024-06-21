@@ -4,6 +4,8 @@ import android.os.Build;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import org.nyanya.android.traditionalt9.quirks.kyocera.KYY31Quirks;
+
 public class Quirks {
     public static IQuirks getCurrentPhoneQuirks() {
         String manufacturer = Build.MANUFACTURER;

@@ -1,32 +1,34 @@
 package org.nyanya.android.traditionalt9;
 
+import android.inputmethodservice.InputMethodService;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import org.nyanya.android.traditionalt9.quirks.IQuirks;
 import org.nyanya.android.traditionalt9.quirks.Quirks;
 
-public class InterfaceHandler implements View.OnClickListener, View.OnLongClickListener {
+public class InterfaceHandler implements View.OnClickListener, View.OnLongClickListener, IInterfaceHandler {
 
 	private static final int[] buttons = { R.id.main_left, R.id.main_right, R.id.main_mid };
 	private TraditionalT9 parent;
 	private View mainview;
 	private final IQuirks mQuirks = Quirks.getCurrentPhoneQuirks();
 
-	public InterfaceHandler(View mainview, TraditionalT9 iparent) {
+	public InterfaceHandler(TraditionalT9 iparent) {
+		mainview = iparent.getLayoutInflater().inflate(R.layout.mainview, null);
 		this.parent = iparent;
 		changeView(mainview);
 	}
 
-	protected View getMainview() {
-		return mainview;
+	@Override
+	public void rebuildView(InputMethodService svc) {
+		mainview = svc.getLayoutInflater().inflate(R.layout.mainview, null);
+		changeView(mainview);
 	}
 
-
-	protected void changeView(View v) {
+	private void changeView(View v) {
 		this.mainview = v;
 		View button;
 		for (int buttid : buttons) {
@@ -38,7 +40,8 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 		}
 	}
 
-	protected void setPressed(int keyCode, boolean pressed) {
+	@Override
+	public void setPressed(int keyCode, boolean pressed) {
 		int id = 0;
 		if(keyCode == mQuirks.getLeftSoftKey()) {
 			id = R.id.main_left;
@@ -54,8 +57,9 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 		}
 	}
 
-	protected void showNotFound(boolean notfound) {
-		if (notfound) {
+	@Override
+	public void showNotFound(boolean notFound) {
+		if (notFound) {
 			((TextView) mainview.findViewById(R.id.left_hold_upper))
 				.setText(R.string.main_left_notfound);
 			((TextView) mainview.findViewById(R.id.left_hold_lower))
@@ -68,11 +72,8 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 		}
 	}
 
-	protected void emulateMiddleButton() {
-		((Button) mainview.findViewById(R.id.main_mid)).performClick();
-	}
-
-	protected void midButtonUpdate(boolean composing) {
+	@Override
+	public void midButtonUpdate(boolean composing) {
 		if (composing) {
 			((TextView) mainview.findViewById(R.id.main_mid)).setText(R.string.main_mid_commit);
 		} else {
@@ -103,7 +104,8 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 		}
 	}
 
-	protected void showHold(boolean show) {
+	@Override
+	public void showHold(boolean show) {
 		ViewSwitcher vs = (ViewSwitcher) mainview.findViewById(R.id.main_left);
 		if (show) {
 			vs.setDisplayedChild(1);
@@ -127,11 +129,8 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 		return true;
 	}
 
-	protected void hideView() {
-		mainview.setVisibility(View.GONE);
-	}
-
-	protected void showView() {
-		mainview.setVisibility(View.VISIBLE);
+	@Override
+	public View getView() {
+		return mainview;
 	}
 }

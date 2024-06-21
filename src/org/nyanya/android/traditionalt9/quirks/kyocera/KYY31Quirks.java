@@ -1,8 +1,11 @@
-package org.nyanya.android.traditionalt9.quirks;
+package org.nyanya.android.traditionalt9.quirks.kyocera;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputConnection;
+
+import org.nyanya.android.traditionalt9.IInterfaceHandler;
+import org.nyanya.android.traditionalt9.quirks.SoftkeyQuirks;
 
 public class KYY31Quirks extends SoftkeyQuirks {
     private static final String PRIVATE_IME_COMMAND_ACTION_FINISH = "Finish_IME";
@@ -45,5 +48,10 @@ public class KYY31Quirks extends SoftkeyQuirks {
             isEditing = false;
         }
         super.onEndEditing(inputConnection);
+    }
+
+    @Override
+    public <T extends IInterfaceHandler> Class<T> customInterfaceHandler() {
+        return (Class<T>) KYY31InterfaceHandler.class;
     }
 }

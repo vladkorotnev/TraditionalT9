@@ -34,7 +34,7 @@ public class TraditionalT9 extends InputMethodService implements
 	private IQuirks mQuirks = Quirks.getCurrentPhoneQuirks();
 
 	private CandidateView mCandidateView;
-	private InterfaceHandler interfacehandler = null;
+	private IInterfaceHandler interfacehandler = null;
 
 	private StringBuilder mComposing = new StringBuilder();
 	private StringBuilder mComposingI = new StringBuilder();
@@ -132,8 +132,21 @@ public class TraditionalT9 extends InputMethodService implements
 		db = T9DB.getInstance(this);
 
 		if (interfacehandler == null) {
-			interfacehandler = new InterfaceHandler(getLayoutInflater().inflate(R.layout.mainview,
-					null), this);
+			if(mQuirks.customInterfaceHandler() == null) {
+				interfacehandler = new InterfaceHandler(this);
+			} else {
+				try {
+					interfacehandler = mQuirks.customInterfaceHandler().getConstructor(TraditionalT9.class).newInstance(this);
+				} catch(Exception x) {
+					x.printStackTrace();
+					try {
+						interfacehandler = mQuirks.customInterfaceHandler().newInstance();
+					} catch(Exception e) {
+						e.printStackTrace();
+						interfacehandler = new InterfaceHandler(this);
+					}
+				}
+			}
 		}
 
 		IntentFilter wordAddedIFlt = new IntentFilter();
@@ -145,13 +158,11 @@ public class TraditionalT9 extends InputMethodService implements
 	public boolean onEvaluateInputViewShown() {
 		//Log.d("T9.onEvaluateInputViewShown", "whatis");
 		//Log.d("T9.onEval", "fullscreen?: " + isFullscreenMode() + " isshow?: " + isInputViewShown() + " isrequestedshow?: " + isShowInputRequested());
+		super.onEvaluateInputViewShown();
 		if (mEditing == EDITING_NOSHOW) {
 			return false;
 		}
-		// TODO: Verify if need this:
-//		if (interfacehandler != null) {
-//			interfacehandler.showView();
-//		}
+
 		return true;
 	}
 
@@ -164,14 +175,13 @@ public class TraditionalT9 extends InputMethodService implements
 	@Override
 	public View onCreateInputView() {
 		//updateKeyMode();
-		View v = getLayoutInflater().inflate(R.layout.mainview, null);
-		interfacehandler.changeView(v);
+		interfacehandler.rebuildView(this);
 		if (mKeyMode == MODE_LANG) {
 			interfacehandler.showHold(true);
 		} else {
 			interfacehandler.showHold(false);
 		}
-		return v;
+		return interfacehandler.getView();
 	}
 
 	/**

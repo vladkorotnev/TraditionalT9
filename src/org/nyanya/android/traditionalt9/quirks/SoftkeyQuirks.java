@@ -3,6 +3,8 @@ package org.nyanya.android.traditionalt9.quirks;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputConnection;
 
+import org.nyanya.android.traditionalt9.IInterfaceHandler;
+
 public class SoftkeyQuirks implements IQuirks {
     int leftSoftKey = KeyEvent.KEYCODE_SOFT_LEFT;
     int rightSoftKey = KeyEvent.KEYCODE_SOFT_RIGHT;
@@ -36,6 +38,11 @@ public class SoftkeyQuirks implements IQuirks {
     @Override
     public int getRightSoftKey() {
         return rightSoftKey;
+    }
+
+    @Override
+    public <T extends IInterfaceHandler> Class<T> customInterfaceHandler() {
+        return null;
     }
 }
 
