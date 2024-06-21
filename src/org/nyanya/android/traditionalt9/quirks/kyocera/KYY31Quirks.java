@@ -51,6 +51,7 @@ public class KYY31Quirks extends SoftkeyQuirks {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends IInterfaceHandler> Class<T> customInterfaceHandler() {
         return (Class<T>) KYY31InterfaceHandler.class;
     }

@@ -9,14 +9,14 @@ import android.widget.ViewSwitcher;
 import org.nyanya.android.traditionalt9.quirks.IQuirks;
 import org.nyanya.android.traditionalt9.quirks.Quirks;
 
-public class InterfaceHandler implements View.OnClickListener, View.OnLongClickListener, IInterfaceHandler {
+public class DefaultInterfaceHandler implements View.OnClickListener, View.OnLongClickListener, IInterfaceHandler {
 
 	private static final int[] buttons = { R.id.main_left, R.id.main_right, R.id.main_mid };
 	private TraditionalT9 parent;
 	private View mainview;
 	private final IQuirks mQuirks = Quirks.getCurrentPhoneQuirks();
 
-	public InterfaceHandler(TraditionalT9 iparent) {
+	public DefaultInterfaceHandler(TraditionalT9 iparent) {
 		mainview = iparent.getLayoutInflater().inflate(R.layout.mainview, null);
 		this.parent = iparent;
 		changeView(mainview);

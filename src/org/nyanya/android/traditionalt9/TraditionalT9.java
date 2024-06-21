@@ -133,7 +133,7 @@ public class TraditionalT9 extends InputMethodService implements
 
 		if (interfacehandler == null) {
 			if(mQuirks.customInterfaceHandler() == null) {
-				interfacehandler = new InterfaceHandler(this);
+				interfacehandler = new DefaultInterfaceHandler(this);
 			} else {
 				try {
 					interfacehandler = mQuirks.customInterfaceHandler().getConstructor(TraditionalT9.class).newInstance(this);
@@ -143,7 +143,7 @@ public class TraditionalT9 extends InputMethodService implements
 						interfacehandler = mQuirks.customInterfaceHandler().newInstance();
 					} catch(Exception e) {
 						e.printStackTrace();
-						interfacehandler = new InterfaceHandler(this);
+						interfacehandler = new DefaultInterfaceHandler(this);
 					}
 				}
 			}
