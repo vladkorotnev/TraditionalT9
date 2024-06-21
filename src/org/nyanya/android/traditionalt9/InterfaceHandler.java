@@ -6,12 +6,15 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import org.nyanya.android.traditionalt9.quirks.IQuirks;
+import org.nyanya.android.traditionalt9.quirks.Quirks;
+
 public class InterfaceHandler implements View.OnClickListener, View.OnLongClickListener {
 
 	private static final int[] buttons = { R.id.main_left, R.id.main_right, R.id.main_mid };
 	private TraditionalT9 parent;
 	private View mainview;
-	private final Quirks mQuirks = Quirks.getCurrentPhoneQuirks();
+	private final IQuirks mQuirks = Quirks.getCurrentPhoneQuirks();
 
 	public InterfaceHandler(View mainview, TraditionalT9 iparent) {
 		this.parent = iparent;
@@ -37,10 +40,10 @@ public class InterfaceHandler implements View.OnClickListener, View.OnLongClickL
 
 	protected void setPressed(int keyCode, boolean pressed) {
 		int id = 0;
-		if(keyCode == mQuirks.leftSoftKey) {
+		if(keyCode == mQuirks.getLeftSoftKey()) {
 			id = R.id.main_left;
 		}
-		else if (keyCode == mQuirks.rightSoftKey) {
+		else if (keyCode == mQuirks.getRightSoftKey()) {
 			id = R.id.main_right;
 		}
 		else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {

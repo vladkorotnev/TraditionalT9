@@ -391,7 +391,7 @@ public class TraditionalT9Settings extends ListActivity implements
 
 			String[] ws;
 			int freq;
-			String seq;
+			String seq = null;
 			int linecount = 1;
 			int wordlen;
 			String word = getLine(br, rpl, fname);
@@ -449,19 +449,21 @@ public class TraditionalT9Settings extends ListActivity implements
 					try {
 						seq = CharMap.getStringSequence(word, lang);
 					} catch (NullPointerException e) {
-						rpl.status = false;
-						rpl.addMsg("Error on word ("+word+") line "+
-								linecount+" in (" +	fname+"): "+
-								getResources().getString(R.string.add_word_badchar, lang.name(), word));
-						break;
+//						rpl.status = false;
+//						rpl.addMsg("Error on word ("+word+") line "+
+//								linecount+" in (" +	fname+"): "+
+//								getResources().getString(R.string.add_word_badchar, lang.name(), word));
+//						break;
 					}
 					linecount++;
-					wordhelp.prepareForReplace();
-					wordhelp.bind(seqColumn, seq);
-					wordhelp.bind(langColumn, lang.id);
-					wordhelp.bind(wordColumn, word);
-					wordhelp.bind(freqColumn, freq);
-					wordhelp.execute();
+					if(seq != null) {
+						wordhelp.prepareForReplace();
+						wordhelp.bind(seqColumn, seq);
+						wordhelp.bind(langColumn, lang.id);
+						wordhelp.bind(wordColumn, word);
+						wordhelp.bind(freqColumn, freq);
+						wordhelp.execute();
+					}
 
 					// System.out.println("Progress: " + pos + " Last: " + last
 					// + " fsize: " + fsize);

@@ -21,6 +21,8 @@ import android.widget.Toast;
 
 import org.nyanya.android.traditionalt9.LangHelper.LANGUAGE;
 import org.nyanya.android.traditionalt9.T9DB.DBSettings.SETTING;
+import org.nyanya.android.traditionalt9.quirks.IQuirks;
+import org.nyanya.android.traditionalt9.quirks.Quirks;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ import java.util.List;
 public class TraditionalT9 extends InputMethodService implements
 		KeyboardView.OnKeyboardActionListener {
 
-	private Quirks mQuirks = Quirks.getCurrentPhoneQuirks();
+	private IQuirks mQuirks = Quirks.getCurrentPhoneQuirks();
 
 	private CandidateView mCandidateView;
 	private InterfaceHandler interfacehandler = null;
@@ -302,7 +304,7 @@ public class TraditionalT9 extends InputMethodService implements
 		}
 		mFirstPress = true;
 		mEditing = EDITING;
-		mQuirks.runStartHooks();
+		mQuirks.onStart(currentInputConnection);
 		// Reset our state. We want to do this even if restarting, because
 		// the underlying state of the text editor could have changed in any
 		// way.
@@ -483,7 +485,7 @@ public class TraditionalT9 extends InputMethodService implements
 
 		// TODO: check this?
 		mEditing = NON_EDIT;
-		mQuirks.runEndHooks();
+		mQuirks.onFinish(currentInputConnection);
 		hideWindow();
 		hideStatusIcon();
 	}
@@ -569,7 +571,7 @@ public class TraditionalT9 extends InputMethodService implements
 				return false;
 			}
 			return handleDPAD(keyCode, event, true);
-		} else if (keyCode == mQuirks.leftSoftKey || keyCode == mQuirks.rightSoftKey) {
+		} else if (keyCode == mQuirks.getLeftSoftKey() || keyCode == mQuirks.getRightSoftKey()) {
 			if (!isInputViewShown()) {
 				return super.onKeyDown(keyCode, event);
 			}
@@ -604,7 +606,7 @@ public class TraditionalT9 extends InputMethodService implements
 			return false;
 
 			// special case for softkeys
-		} else if (keyCode == mQuirks.leftSoftKey || keyCode == mQuirks.rightSoftKey) {
+		} else if (keyCode == mQuirks.getLeftSoftKey() || keyCode == mQuirks.getRightSoftKey()) {
 			if (interfacehandler != null) {
 				interfacehandler.setPressed(keyCode, true);
 			}
@@ -662,7 +664,7 @@ public class TraditionalT9 extends InputMethodService implements
 		awintent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		awintent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 		if (interfacehandler != null) {
-			interfacehandler.setPressed(mQuirks.rightSoftKey, false);
+			interfacehandler.setPressed(mQuirks.getRightSoftKey(), false);
 		}
 		hideWindow();
 		startActivity(awintent);
@@ -694,7 +696,7 @@ public class TraditionalT9 extends InputMethodService implements
 				return true;
 			}
 
-		} else if (keyCode == mQuirks.leftSoftKey) {
+		} else if (keyCode == mQuirks.getLeftSoftKey()) {
 			if (interfacehandler != null) {
 				interfacehandler.setPressed(keyCode, false);
 			}
@@ -706,7 +708,7 @@ public class TraditionalT9 extends InputMethodService implements
 				}
 			}
 
-		} else if (keyCode == mQuirks.rightSoftKey) {
+		} else if (keyCode == mQuirks.getRightSoftKey()) {
 			if (interfacehandler != null) {
 				interfacehandler.setPressed(keyCode, false);
 			}
@@ -759,7 +761,7 @@ public class TraditionalT9 extends InputMethodService implements
 				return false;
 			}
 			return handleDPAD(keyCode, event, false);
-		} else if (keyCode == mQuirks.rightSoftKey || keyCode == mQuirks.leftSoftKey) {
+		} else if (keyCode == mQuirks.getRightSoftKey() || keyCode == mQuirks.getLeftSoftKey()) {
 			if (!isInputViewShown()) {
 				return super.onKeyDown(keyCode, event);
 			}
@@ -781,7 +783,7 @@ public class TraditionalT9 extends InputMethodService implements
 			return false;
 
 			// special case for softkeys
-		} else if (keyCode == mQuirks.rightSoftKey || keyCode == mQuirks.leftSoftKey) {// if (mAddingWord){
+		} else if (keyCode == mQuirks.getRightSoftKey() || keyCode == mQuirks.getLeftSoftKey()) {// if (mAddingWord){
 			// Log.d("onKeyUp", "key: " + keyCode + " skip: " +
 			// mAddingSkipInput);
 			// if (mAddingSkipInput) {
@@ -863,6 +865,7 @@ public class TraditionalT9 extends InputMethodService implements
 		clearState();
 		updateCandidates();
 		setCandidatesViewShown(false);
+		mQuirks.onEndEditing(currentInputConnection);
 	}
 
 	/**
@@ -925,13 +928,13 @@ public class TraditionalT9 extends InputMethodService implements
 		} else if (keyCode == KeyEvent.KEYCODE_POUND) {
 			// space
 			handleCharacter(KeyEvent.KEYCODE_POUND);
-		} else if (keyCode == mQuirks.leftSoftKey) {
+		} else if (keyCode == mQuirks.getLeftSoftKey()) {
 			if (mWordFound) {
 				showSymbolPage();
 			} else {
 				showAddWord();
 			}
-		} else if (keyCode == mQuirks.rightSoftKey) {
+		} else if (keyCode == mQuirks.getRightSoftKey()) {
 			nextKeyMode();
 
 		} else {
@@ -1047,7 +1050,7 @@ public class TraditionalT9 extends InputMethodService implements
 					}
 				}
 				setSuggestions(mSuggestionStrings, 0);
-				} else {
+			} else {
 				setSuggestions(null, -1);
 				setCandidatesViewShown(false);
 				if (interfacehandler != null) {
@@ -1074,6 +1077,9 @@ public class TraditionalT9 extends InputMethodService implements
 	private void setSuggestions(List<String> suggestions, int initialSel) {
 		if (suggestions != null && suggestions.size() > 0) {
 			setCandidatesViewShown(true);
+			mQuirks.onBeginEditing(currentInputConnection);
+		} else {
+			mQuirks.onEndEditing(currentInputConnection);
 		}
 		if (mCandidateView != null) {
 			mCandidateView.setSuggestions(suggestions, initialSel);
